@@ -1,10 +1,13 @@
 package com.kabasonic.weather;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,12 +19,8 @@ import com.kabasonic.weather.model.location.LocationRequest;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Interceptor;
@@ -38,13 +37,26 @@ public class MainActivity extends AppCompatActivity {
     private JsonWeatherApiPlaceHolder jsonWeatherApiPlaceHolder;
     private JsonLocationApiPlaceHolder jsonLocationApiPlaceHolder;
 
-    public static  float lat = 0;
-    public static  float lon = 0;
+    public static float lat = 0;
+    public static float lon = 0;
+
+    private AutoCompleteTextView editText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        editText = findViewById(R.id.auto_tx_location);
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!editText.equals("")){
+                    fetchWeather(editText.getText().toString().trim());
+                }
+            }
+        });
 
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -85,23 +97,39 @@ public class MainActivity extends AppCompatActivity {
         jsonWeatherApiPlaceHolder = retrofit.create(JsonWeatherApiPlaceHolder.class);
         jsonLocationApiPlaceHolder = retrofit1.create(JsonLocationApiPlaceHolder.class);
 
-        fetchWeather();
-        fetchDailyWeather();
+        //fetchWeather();
+        //fetchDailyWeather();
         fetchLocation();
+
     }
 
-    private void fetchLocation(){
+    private void setAutoCompleteLocation(List<String> list) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                R.layout.list_item_search, R.id.text_view_list_item, list);
+        editText.setAdapter(adapter);
+    }
+
+
+    private void fetchLocation() {
         Call<LocationRequest> locationRequestCall = jsonLocationApiPlaceHolder.getLocationRequest();
         locationRequestCall.enqueue(new Callback<LocationRequest>() {
             @Override
             public void onResponse(Call<LocationRequest> call, Response<LocationRequest> response) {
-                if(!response.isSuccessful()){
+                if (!response.isSuccessful()) {
                     Log.d(getClass().getSimpleName(), "onResponse|postList|Message" + response.message());
                     return;
                 }
                 LocationRequest locationRequest = response.body();
                 List<Datum> locationList = locationRequest.getData();
-
+                List<String> listString = new ArrayList<>();
+                for (Datum location : locationList) {
+                    for (String cities : location.getCities()) {
+                        listString.add(cities + ", " + location.getCountry());
+                    }
+                }
+                setAutoCompleteLocation(listString);
+                //write to file
+                //if file has been empty, make request, else read with file
             }
 
             @Override
@@ -112,67 +140,65 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void fetchDailyWeather() {
 
-
-    private void fetchDailyWeather(){
-
-            Call<DailyRequest> dailyRequestCall = jsonWeatherApiPlaceHolder.getDailyWeatherData(lat, lon, "","metric","en");
-            dailyRequestCall.enqueue(new Callback<DailyRequest>() {
-                @Override
-                public void onResponse(Call<DailyRequest> call, Response<DailyRequest> response) {
-                    if(!response.isSuccessful()){
-                        Log.d(getClass().getSimpleName(), "onResponse|postList|Message" + response.message());
-                        return;
-                    }
-                    //alert
-                    //current
-                    //daily
-                    //hourly
-                    //minutely
-                    //rain
-                    //temp
-                    //feelsLike
+        Call<DailyRequest> dailyRequestCall = jsonWeatherApiPlaceHolder.getDailyWeatherData(lat, lon, "", "metric", "en");
+        dailyRequestCall.enqueue(new Callback<DailyRequest>() {
+            @Override
+            public void onResponse(Call<DailyRequest> call, Response<DailyRequest> response) {
+                if (!response.isSuccessful()) {
+                    Log.d(getClass().getSimpleName(), "onResponse|postList|Message" + response.message());
+                    return;
                 }
+                //alert
+                //current
+                //daily
+                //hourly
+                //minutely
+                //rain
+                //temp
+                //feelsLike
+            }
 
-                @Override
-                public void onFailure(Call<DailyRequest> call, Throwable t) {
-                    Log.d(getClass().getSimpleName(), "onFailure|postsList|Message: " + t.getMessage());
-                }
-            });
+            @Override
+            public void onFailure(Call<DailyRequest> call, Throwable t) {
+                Log.d(getClass().getSimpleName(), "onFailure|postsList|Message: " + t.getMessage());
+            }
+        });
 
     }
 
-    private void getCoord(WeatherRequest request){
+    private void getCoord(WeatherRequest request) {
         Log.i("Coord", request.getCoord().toString());
         lat = request.getCoord().getLat();
         lon = request.getCoord().getLon();
     }
 
-    private void getWeather(WeatherRequest request){
+    private void getWeather(WeatherRequest request) {
         List<Weather> callWeatherList = request.getWeather();
-        for(Weather weather: callWeatherList){
+        for (Weather weather : callWeatherList) {
             Log.i("Weather", request.getWeather().toString());
         }
     }
 
-    private void getClouds(WeatherRequest request){
-        Log.i("Clouds",request.getClouds().toString());
+    private void getClouds(WeatherRequest request) {
+        Log.i("Clouds", request.getClouds().toString());
     }
 
-    private void getMain(WeatherRequest request){
-        Log.i("Main",request.getMain().toString());
+    private void getMain(WeatherRequest request) {
+        Log.i("Main", request.getMain().toString());
     }
 
-    private void getSys(WeatherRequest request){
-        Log.i("Sys",request.getSys().toString());
+    private void getSys(WeatherRequest request) {
+        Log.i("Sys", request.getSys().toString());
     }
 
-    private void getWind(WeatherRequest request){
-        Log.i("Wind",request.getWind().toString());
+    private void getWind(WeatherRequest request) {
+        Log.i("Wind", request.getWind().toString());
     }
 
-    private void fetchWeather(){
-        Call<WeatherRequest> weatherCall = jsonWeatherApiPlaceHolder.getWeatherData("Lublin","metric","en");
+    private void fetchWeather(String city) {
+        Call<WeatherRequest> weatherCall = jsonWeatherApiPlaceHolder.getWeatherData(city, "metric", "en");
         weatherCall.enqueue(new Callback<WeatherRequest>() {
             @Override
             public void onResponse(Call<WeatherRequest> call, Response<WeatherRequest> response) {

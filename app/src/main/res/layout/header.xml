@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@drawable/sky_background_night"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        />-->
+
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@drawable/sky_background_night"-->
+<!--        android:scale-->
+<!--    -->
+
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@drawable/stars_night"-->
+<!--        android:scaleType="center"-->
+<!--        android:layout_margin="32dp"-->
+<!--        />-->
+
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@drawable/clouds_night"-->
+<!--        android:scaleType="center"-->
+<!--        android:layout_margin="32dp"-->
+<!--        />-->
+
+<!--    <ImageView-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@drawable/moon_night"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        android:layout_gravity="right"-->
+<!--        -->
+<!--        />-->
+
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@drawable/city_night"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        android:layout_gravity="bottom"-->
+<!--        />-->
+
+</FrameLayout>
